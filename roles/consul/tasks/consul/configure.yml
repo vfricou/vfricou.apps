@@ -1,0 +1,78 @@
+---
+- name: "consul | configure | Deploy Consul configuration for servers"
+  become: true
+  tags:
+    - consul_install
+    - consul_configure
+    - consul_server
+  when:
+    - "'consul_servers' in group_names"
+  notify: 'Restart Consul'
+  ansible.builtin.template:
+    src: consul/consul.json.j2
+    dest: "{{ consul_base_dir_path }}/conf/consul.json"
+    owner: 'consul'
+    group: 'consul'
+    mode: '0640'
+    seuser: 'system_u'
+    serole: 'object_r'
+    setype: 'etc_t'
+    selevel: 's0'
+
+- name: "consul | configure | Deploy Consul configuration for agents"
+  become: true
+  tags:
+    - consul_install
+    - consul_configure
+    - consul_agent
+  when:
+    - "'consul_agents' in group_names"
+  notify: 'Restart Consul'
+  ansible.builtin.template:
+    src: consul/consul.json.j2
+    dest: "{{ consul_base_dir_path }}/conf/consul.json"
+    owner: 'consul'
+    group: 'consul'
+    mode: '0640'
+    seuser: 'system_u'
+    serole: 'object_r'
+    setype: 'etc_t'
+    selevel: 's0'
+
+- name: "consul | configure | Deploy services"
+  become: true
+  tags:
+    - consul_configure
+    - consul_services
+  when:
+    - consul_services is defined
+  notify: 'Restart Consul'
+  ansible.builtin.copy:
+    content: "{{ consul_services }}"
+    dest: "{{ consul_base_dir_path }}/conf/services.hcl"
+    owner: 'consul'
+    group: 'consul'
+    mode: '0640'
+    seuser: 'system_u'
+    serole: 'object_r'
+    setype: 'etc_t'
+    selevel: 's0'
+
+- name: "consul | configure | Deploy systemd unit"
+  become: true
+  tags:
+    - consul_install
+    - consul_configure
+    - consul_server
+    - consul_agent
+  notify: 'Restart Consul'
+  ansible.builtin.template:
+    src: consul/consul.service.j2
+    dest: '/etc/systemd/system/consul.service'
+    owner: 'root'
+    group: 'root'
+    mode: '0644'
+    seuser: 'system_u'
+    serole: 'object_r'
+    setype: 'systemd_unit_file_t'
+    selevel: 's0'

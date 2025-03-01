@@ -1,0 +1,166 @@
+---
+argument_specs:
+  main:
+    author:
+      - 'Vincent FRICOU'
+    short_description: 'Install and configure Hashicorp Consul'
+    description:
+      - "Install Hashicorp Consul"
+      - "Configure Hashicorp Consul"
+      - "Manage Server and Agent mode"
+    options:
+      consul_version:
+        type: str
+        description: 'Hashicorp Consul version'
+        required: false
+        default: '1.20.1'
+
+      consul_download_url:
+        type: str
+        description:
+          - 'Hashicorp Consul download URL base path'
+          - 'Override default URL to specific use URL'
+          - 'By default computed to form {{ consul_download_url_base }}/{{ consul_version }}/consul_{{ consul_version }}_linux_{{ ansible_architecture }}'
+        required: false
+
+      consul_username:
+        type: str
+        description: 'System user will run Consul'
+        required: false
+        default: 'consul'
+
+      consul_group:
+        type: str
+        description: 'System group will run Consul'
+        required: false
+        default: 'consul'
+
+      consul_base_dir_path:
+        type: str
+        description: 'Folder where store consul binaries and datas'
+        required: false
+        default: '/opt/consul'
+
+      consul_conf_bind_address:
+        type: str
+        description: 'Consul bind address'
+        required: false
+        default: '0.0.0.0'
+
+      consul_conf_client_address:
+        type: str
+        description: 'Consul client address'
+        required: false
+        default: '0.0.0.0'
+
+      consul_conf_domain:
+        type: str
+        description: 'Consul DNS domain'
+        required: true
+
+      consul_conf_datacenter_name:
+        type: str
+        description: 'Consul datacenter name'
+        required: true
+
+      consul_conf_log_level:
+        type: str
+        description: 'Consul logging level'
+        required: false
+        default: 'INFO'
+
+      consul_conf_enable_ui:
+        type: bool
+        description: 'Enable Consul UI for server'
+        required: false
+        default: true
+
+      consul_conf_encrypt_key:
+        type: 'str'
+        description: 'Consul encryption key'
+        required: true
+
+      consul_port_dns:
+        type: int
+        description:
+          - 'Consul DNS port.'
+          - 'Consult https://developer.hashicorp.com/consul/docs/install/ports'
+        required: false
+        default: 8600
+
+      consul_port_http:
+        type: int
+        description:
+          - 'Consul HTTP port.'
+          - 'Consult https://developer.hashicorp.com/consul/docs/install/ports'
+        required: false
+        default: 8500
+
+      consul_port_https:
+        type: int
+        description:
+          - 'Consul HTTPS port.'
+          - 'Consult https://developer.hashicorp.com/consul/docs/install/ports'
+        required: false
+
+      consul_port_grpc:
+        type: int
+        description:
+          - 'Consul gRPC port'
+          - 'Consult https://developer.hashicorp.com/consul/docs/install/ports'
+        required: false
+
+      consul_port_grpc_tls:
+        type: int
+        description:
+          - 'Consul gRPC TLS port'
+          - 'Consult https://developer.hashicorp.com/consul/docs/install/ports'
+        required: false
+        default: 8503
+
+      consul_port_serf_lan:
+        type: int
+        description:
+          - 'Consul SERF LAN port'
+          - 'Consult https://developer.hashicorp.com/consul/docs/install/ports'
+        required: false
+        default: 8301
+
+      consul_port_serf_wan:
+        type: int
+        description:
+          - 'Consul SERF WAN port'
+          - 'Consult https://developer.hashicorp.com/consul/docs/install/ports'
+        required: false
+
+      consul_port_server:
+        type: int
+        description:
+          - 'Consul Server port'
+          - 'Consult https://developer.hashicorp.com/consul/docs/install/ports'
+        required: false
+        default: 8300
+
+      consul_services:
+        type: str
+        description: 'Services to declare'
+        required: false
+
+    examples: |
+      # Consul services declaration
+      consul_services: |
+        services {
+          id = "vault"
+          name = "vault"
+          port = 8200
+          tags = [
+            "vault"
+          ]
+          check = {
+              id = "vault-transit"
+              name = "Check Vault API liveness"
+              http = "https://127.0.0.1:8200"
+              tls_skip_verify = true
+              interval = "60s"
+          }
+        }

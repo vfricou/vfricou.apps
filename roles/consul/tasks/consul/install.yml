@@ -1,0 +1,42 @@
+---
+- name: "consul | install | Download Consul binary archive" # noqa: jinja[spacing]
+  become: true
+  become_user: 'root'
+  tags:
+    - consul_install
+    - consul_update
+    - consul_server
+    - consul_agent
+  vars:
+    __dl_url: >-
+      {%- if consul_download_url is defined -%}
+      {{ consul_download_url }}
+      {%- else -%}
+      {{ consul_dl_base_path }}/{{ consul_version }}/consul_{{ consul_version }}_linux_{{ _host_arch }}.zip
+      {%- endif -%}
+  ansible.builtin.get_url:
+    url: "{{ __dl_url }}"
+    dest: "{{ consul_base_dir_path }}/archive/consul_{{ consul_version }}_linux_amd64.zip"
+    owner: 'root'
+    group: 'root'
+    mode: '0600'
+
+- name: "consul | install | Unarchive"
+  become: true
+  become_user: 'root'
+  tags:
+    - consul_install
+    - consul_update
+    - consul_server
+    - consul_agent
+  ansible.builtin.unarchive:
+    remote_src: true
+    dest: "{{ consul_base_dir_path }}/bin"
+    src: "{{ consul_base_dir_path }}/archive/consul_{{ consul_version }}_linux_amd64.zip"
+    owner: "{{ consul_username }}"
+    group: "{{ consul_group }}"
+    mode: '0750'
+    seuser: 'system_u'
+    serole: 'object_r'
+    setype: 'bin_t'
+    selevel: 's0'
