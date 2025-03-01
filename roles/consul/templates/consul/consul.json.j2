@@ -1,0 +1,42 @@
+{
+  "advertise_addr": "{{ ansible_default_ipv4.address }}",
+  "bind_addr": "{{ consul_conf_bind_address }}",
+  "client_addr": "{{ consul_conf_client_address }}",
+  "domain": "{{ consul_conf_domain }}",
+  "enable_script_checks": true,
+  "datacenter": "{{ consul_conf_datacenter_name }}",
+  "data_dir": "{{ consul_base_dir_path }}/data",
+  "log_level": "{{ consul_conf_log_level }}",
+  "node_name": "{{ ansible_nodename }}",
+  "dns_config": {
+    "enable_truncate": true,
+    "only_passing": true
+  },
+  "disable_keyring_file": true,
+  "encrypt": "{{ consul_conf_encrypt_key | b64encode }}",
+  "encrypt_verify_incoming": true,
+  "encrypt_verify_outgoing": true,
+  "enable_syslog": true,
+  "leave_on_terminate": true,
+  "rejoin_after_leave": true,
+  "ports": {
+    "dns": {{ consul_port_dns }},
+    "http": {{ consul_port_http }},
+    "https": {{ consul_port_https | default(-1) }},
+    "grpc": {{ consul_port_grpc | default(-1) }},
+    "grpc_tls": {{ consul_port_grpc_tls }},
+    "serf_lan": {{ consul_port_serf_lan }},
+    "serf_wan": {{ consul_port_serf_wan }},
+    "server": {{ consul_port_server }}
+  },
+{% set server_node_ips_array=[] %}
+{% for host in groups['consul_servers'] %}
+{% if server_node_ips_array.insert(loop.index,hostvars[host]['ansible_host']) %} {% endif %}
+{% endfor %}
+{% if 'consul_servers' in group_names %}
+  "bootstrap_expect": {{ groups['consul_servers'] | length }},
+  "server": true,
+  "ui": {{ consul_conf_enable_ui | lower() }},
+{% endif %}
+  "retry_join": ["{{ server_node_ips_array|join('","') }}"]
+}

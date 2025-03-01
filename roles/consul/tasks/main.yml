@@ -1,0 +1,9 @@
+---
+- name: 'Include Consul preflight tasks'
+  ansible.builtin.import_tasks: consul/preflight.yml
+
+- name: 'Include Consul install tasks'
+  ansible.builtin.import_tasks: consul/install.yml
+
+- name: 'Include Consul configurations tasks'
+  ansible.builtin.import_tasks: consul/configure.yml

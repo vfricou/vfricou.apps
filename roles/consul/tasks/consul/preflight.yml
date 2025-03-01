@@ -1,0 +1,105 @@
+---
+- name: "consul | preflight | Assert target host architecture"
+  tags:
+    - consul_agent
+    - consul_configure
+    - consul_install
+    - consul_server
+    - consul_services
+    - consul_update
+  ansible.builtin.assert:
+    that: ansible_architecture == 'amd64' or ansible_architecture == 'arm64' or ansible_architecture == 'x86_64'
+
+- name: "consul | preflight | Set fact with architecture for amd64 or arm64" # noqa: jinja[spacing]
+  tags:
+    - consul_agent
+    - consul_configure
+    - consul_install
+    - consul_server
+    - consul_services
+    - consul_update
+  ansible.builtin.set_fact:
+    _host_arch: >-
+      {%- if ansible_architecture == 'x86_64' -%}
+      amd64
+      {%- else -%}
+      {{ ansible_architecture }}
+      {%- endif -%}
+
+- name: "consul | preflight | Set fact with architecture for aarch64 hosts"
+  tags:
+    - consul_agent
+    - consul_configure
+    - consul_install
+    - consul_server
+    - consul_services
+    - consul_update
+  when:
+    - ansible_architecture == 'aarch64'
+  ansible.builtin.set_fact:
+    _host_arch: 'arm64'
+
+- name: "consul | preflight | Ensure required packages are present"
+  become: true
+  become_user: 'root'
+  tags:
+    - consul_agent
+    - consul_install
+    - consul_server
+    - consul_update
+  ansible.builtin.package:
+    state: present
+    name: unzip
+
+- name: "consul | preflight | Ensure group exist"
+  become: true
+  become_user: 'root'
+  tags:
+    - consul_install
+    - consul_server
+    - consul_agent
+  ansible.builtin.group:
+    name: "{{ consul_group }}"
+    state: present
+    system: true
+
+- name: "consul | preflight | Ensure user exist"
+  become: true
+  become_user: 'root'
+  tags:
+    - consul_install
+    - consul_server
+    - consul_agent
+  ansible.builtin.user:
+    name: "{{ consul_username }}"
+    state: present
+    system: true
+    comment: "Consul system user"
+    create_home: false
+    home: "{{ consul_base_dir_path }}"
+    group: "{{ consul_group }}"
+
+- name: "consul | preflight | Ensure required folders exists"
+  become: true
+  become_user: 'root'
+  tags:
+    - consul_install
+    - consul_update
+    - consul_server
+    - consul_agent
+  loop:
+    - { path: "{{ consul_base_dir_path }}",         seuser: 'system_u', serole: 'object_r', setype: 'etc_t',     selevel: 's0' } # noqa: yaml[commas]
+    - { path: "{{ consul_base_dir_path }}/archive", seuser: 'system_u', serole: 'object_r', setype: 'var_lib_t', selevel: 's0' } # noqa: yaml[commas]
+    - { path: "{{ consul_base_dir_path }}/bin",     seuser: 'system_u', serole: 'object_r', setype: 'bin_t',     selevel: 's0' } # noqa: yaml[commas]
+    - { path: "{{ consul_base_dir_path }}/conf",    seuser: 'system_u', serole: 'object_r', setype: 'etc_t',     selevel: 's0' } # noqa: yaml[commas]
+    - { path: "{{ consul_base_dir_path }}/data",    seuser: 'system_u', serole: 'object_r', setype: 'var_lib_t', selevel: 's0' } # noqa: yaml[commas]
+  ansible.builtin.file:
+    state: directory
+    path: "{{ item.path }}"
+    owner: "{{ consul_username }}"
+    group: "{{ consul_group }}"
+    mode: "0770"
+    seuser: "{{ item.seuser }}"
+    serole: "{{ item.serole }}"
+    setype: "{{ item.setype }}"
+    selevel: "{{ item.selevel }}"

@@ -1,0 +1,11 @@
+---
+- name: 'Restart Consul'
+  become: true
+  become_user: 'root'
+  tags:
+    - always
+  ansible.builtin.systemd:
+    name: consul
+    state: restarted
+    daemon_reload: true
+    enabled: true

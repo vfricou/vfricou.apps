@@ -1,0 +1,22 @@
+service {
+  id = "{{ item.name }}"
+  name = "{{ item.name }}"
+  {% if item.port is defined %}
+  port = {{ item.port }}
+  {% endif %}
+  {% if item.tags is defined %}
+  tags = [
+  {% for tag in item.tags %}
+    "{{ tag }}"{{ "," if not loop.last else "" }}
+  {% endfor %}
+  ]
+  {% endif %}
+  {% if item.check_enabled is defined and item.check_enabled %}
+  check = {
+      id = "{{ item.name }}"
+      name = "{{ item.check.name }}"
+      {{ item.check.type }} = "{{ item.check.target }}"
+      interval = "{{ item.check.interval | default("60s") }}"
+  }
+  {% endif %}
+}

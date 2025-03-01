@@ -1,0 +1,15 @@
+---
+consul_version: '1.20.1'
+consul_username: 'consul'
+consul_group: 'consul'
+consul_base_dir_path: '/opt/consul'
+consul_conf_bind_address: '0.0.0.0'
+consul_conf_client_address: '0.0.0.0'
+consul_conf_log_level: 'INFO'
+consul_conf_enable_ui: true
+consul_port_dns: 8600
+consul_port_http: 8500
+consul_port_serf_lan: 8301
+consul_port_serf_wan: 8302
+consul_port_grpc_tls: 8503
+consul_port_server: 8300
