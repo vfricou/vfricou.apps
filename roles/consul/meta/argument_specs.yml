@@ -147,20 +147,54 @@ argument_specs:
         required: false
 
     examples: |
-      # Consul services declaration
-      consul_services: |
-        services {
-          id = "vault"
-          name = "vault"
-          port = 8200
-          tags = [
-            "vault"
-          ]
-          check = {
-              id = "vault-transit"
-              name = "Check Vault API liveness"
-              http = "https://127.0.0.1:8200"
-              tls_skip_verify = true
-              interval = "60s"
-          }
-        }
+      # Playbook Consul cluster deployment
+      - name: 'Consul Cluster'
+        hosts:
+          - consul_cluster
+        gather_facts: true
+        roles:
+          - role: vfricou.apps.consul
+            vars:
+              consul_conf_domain: "consul"
+              consul_conf_datacenter_name: "dc"
+              consul_conf_encrypt_key: "<secret_encryption_key>"
+
+      # Plakbook Consul agent deployment
+      - name: 'Consul Cluster'
+        hosts:
+          - consul_agents
+        gather_facts: true
+        roles:
+          - role: vfricou.apps.consul
+            vars:
+              consul_conf_domain: "consul"
+              consul_conf_datacenter_name: "dc"
+              consul_conf_encrypt_key: "<secret_encryption_key>"
+
+      # Playbook Consul agent deployment with service - Example for Vault
+      - name: 'Consul Cluster'
+        hosts:
+          - consul_agents
+        gather_facts: true
+        roles:
+          - role: vfricou.apps.consul
+            vars:
+              consul_conf_domain: "consul"
+              consul_conf_datacenter_name: "dc"
+              consul_conf_encrypt_key: "<secret_encryption_key>"
+              consul_services: |
+                services {
+                  id = "vault"
+                  name = "vault"
+                  port = 8200
+                  tags = [
+                    "vault"
+                  ]
+                  check = {
+                      id = "vault"
+                      name = "Check Vault API liveness"
+                      http = "https://127.0.0.1:8200"
+                      tls_skip_verify = true
+                      interval = "60s"
+                  }
+                }
