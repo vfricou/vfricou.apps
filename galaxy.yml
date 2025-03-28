@@ -7,14 +7,14 @@ version: "1.0.0"
 readme: "README.md"
 authors:
   - "Vincent FRICOU"
-description: "Vaious applications collection containing roles and modules"
+description: "Various applications collection containing roles and modules"
 
 license:
   - "AGPL-3.0-only"
 license_file: 'LICENSE'
 
 repository: "https://github.com/vfricou/vfricou.apps/"
-documentation: "https://ansible-docs.home.gate.fricouv.eu/ansible-documentation/collections/fricouv/apps/index.html#plugins-in-fricouv-apps"
+documentation: "https://vfricou.github.io/collection-documentation/"
 homepage: "https://github.com/vfricou/vfricou.apps/"
 issues: "https://github.com/vfricou/vfricou.apps/issues"
 build_ignore: []
