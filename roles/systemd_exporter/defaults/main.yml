@@ -1,0 +1,4 @@
+---
+systemd_exporter_version: '0.7.0'
+systemd_exporter_download_url: "https://github.com/prometheus-community/systemd_exporter/releases/download/v{{ systemd_exporter_version}}"
+systemd_exporter_pkg_name: "systemd_exporter-{{ systemd_exporter_version}}.linux-{{ __architecture }}.tar.gz"

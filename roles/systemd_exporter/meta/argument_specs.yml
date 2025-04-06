@@ -1,0 +1,26 @@
+---
+argument_specs:
+  main:
+    author:
+      - 'Vincent FRICOU'
+    short_description: 'Install Prometheus systemd exporter'
+    description:
+      - "Install Prometheus systemd exporter"
+    options:
+      systemd_exporter_version:
+        type: str
+        description: "Vertion to install"
+        required: false
+        default: '0.7.0'
+      systemd_exporter_download_url:
+        type: str
+        description: "Download URL"
+        required: false
+        default: "https://github.com/prometheus-community/systemd_exporter/releases/download/v{{ systemd_exporter_version}}"
+      systemd_exporter_pkg_name:
+        type: str
+        description:
+          - "Systemd exporter package name to retrieve"
+          - "C(__architecture) will determinated at first task of role"
+        required: false
+        default: "systemd_exporter-{{ systemd_exporter_version}}.linux-{{ __architecture }}.tar.gz"

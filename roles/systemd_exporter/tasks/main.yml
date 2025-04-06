@@ -1,0 +1,37 @@
+---
+- name: 'Compute host architecture'
+  ansible.builtin.set_fact:
+    __architecture: >-
+      {%- if ansible_architecture == 'x86_64' or ansible_architecture == 'amd64' -%}
+      amd64
+      {%- elif ansible_architecture == 'i386' or ansible_architecture == '386' -%}
+      386
+      {%- else -%}
+      {{ ansible_architecture }}
+      {%- endif -%}
+
+- name: 'Download package archive'
+  ansible.builtin.get_url:
+    url: "{{ systemd_exporter_download_url }}/{{ systemd_exporter_pkg_name }}"
+    dest: "/tmp"
+
+- name: 'Extract package archive'
+  ansible.builtin.unarchive:
+    dest: "/tmp/"
+    src: "/tmp/{{ systemd_exporter_pkg_name }}"
+
+- name: 'Move binary to final location'
+  become: true
+  ansible.builtin.copy:
+    dest: '/usr/local/bin/systemd_exporter'
+    src: "/tmp/{{ systemd_exporter_pkg_name.split('.tar') | first }}/systemd_exporter"
+    owner: 'root'
+    group: 'root'
+    mode: '0700'
+
+- name: 'Cleanup'
+  loop:
+    - "/tmp/{{ systemd_exporter_pkg_name }}"
+    - "/tmp/{{ systemd_exporter_pkg_name.split('.tar') | first }}"
+  ansible.builtin.file:
+    path: '{{ item }}'
