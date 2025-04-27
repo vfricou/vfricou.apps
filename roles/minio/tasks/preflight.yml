@@ -1,0 +1,81 @@
+---
+- name: 'preflight | If no repository override'
+  tags:
+    - minio
+    - minio_install
+  when:
+    - minio_dl_url is not defined
+  block:
+    - name: 'preflight | Define download URL if version is latest'
+      when:
+        - minio_version == 'latest'
+      ansible.builtin.set_fact:
+        minio_dl_url: "{{ minio_package.base_url }}/minio"
+
+    - name: 'preflight | Define download URL if version is not latest'
+      when:
+        - minio_version != 'latest'
+      ansible.builtin.set_fact:
+        minio_dl_url: "{{ minio_package.base_url }}/archive/minio.RELEASE.{{ minio_version }}"
+
+- name: 'preflight | Ensure system group exist'
+  become: true
+  tags:
+    - minio
+    - minio_install
+  ansible.builtin.group:
+    name: "{{ minio_group }}"
+    state: present
+    system: true
+
+- name: 'preflight | Ensure minio system user exist'
+  become: true
+  tags:
+    - minio
+    - minio_install
+  ansible.builtin.user:
+    name: "{{ minio_user }}"
+    group: "{{ minio_group }}"
+    state: present
+    home: "{{ minio_base_path }}"
+    system: true
+    shell: '/bin/bash'
+
+- name: 'preflight | Ensure rights on minio home folder'
+  become: true
+  tags:
+    - minio
+    - minio_install
+  ansible.builtin.file:
+    path: "{{ minio_base_path }}"
+    recurse: false
+    owner: "{{ minio_user }}"
+    group: "{{ minio_group }}"
+    mode: '0700'
+    seuser: 'system_u'
+    serole: 'object_r'
+    setype: 'home_t'
+    selevel: 's0'
+
+- name: 'preflight | Ensure required folders exists'
+  become: true
+  tags:
+    - minio
+    - minio_install
+  loop:
+    - name: datas
+      setype: 'var_lib_t'
+    - name: confs
+      setype: 'etc_t'
+    - name: bin
+      setype: 'bin_t'
+  ansible.builtin.file:
+    path: "{{ minio_base_path }}/{{ item.name }}"
+    owner: "{{ minio_user }}"
+    group: "{{ minio_group }}"
+    mode: '0750'
+    seuser: 'system_u'
+    serole: 'object_r'
+    setype: "{{ item.setype }}"
+    selevel: 's0'
+    state: directory

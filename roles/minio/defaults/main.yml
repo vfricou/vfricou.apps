@@ -1,0 +1,11 @@
+---
+minio_version: 'latest'
+minio_user: 'minio'
+minio_group: 'minio'
+minio_base_path: '/opt/minio'
+minio_no_log: true
+
+minio_bind_address: '0.0.0.0'
+minio_bind_port: 9000
+minio_console_bind_address: '0.0.0.0'
+minio_console_bind_port: 9001

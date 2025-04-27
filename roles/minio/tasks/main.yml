@@ -1,0 +1,49 @@
+---
+- name: 'Go to version validation'
+  ansible.builtin.import_tasks: preflight.yml
+
+- name: 'Download minio binary'
+  become: true
+  tags:
+    - minio
+    - minio_install
+  ansible.builtin.get_url:
+    url: "{{ minio_dl_url }}"
+    dest: "{{ minio_base_path }}/bin/minio"
+    owner: "{{ minio_user }}"
+    group: "{{ minio_group }}"
+    mode: '0750'
+
+- name: 'Deploy minio environment configurations'
+  no_log: "{{ minio_no_log }}"
+  become: true
+  tags:
+    - minio
+    - minio_configure
+  ansible.builtin.template:
+    dest: "{{ minio_base_path }}/confs/env"
+    src: 'minio-env.j2'
+    owner: "{{ minio_user }}"
+    group: "{{ minio_group }}"
+    mode: '0400'
+    seuser: 'system_u'
+    serole: 'object_r'
+    setype: 'etc_t'
+    selevel: 's0'
+
+- name: 'Deploy minio systemd unit'
+  become: true
+  tags:
+    - minio
+    - minio_configure
+  notify: 'Restart minio'
+  ansible.builtin.template:
+    dest: '/etc/systemd/system/minio.service'
+    src: 'etc/systemd/minio.service.j2'
+    owner: 'root'
+    group: 'root'
+    mode: '0640'
+    seuser: 'system_u'
+    serole: 'object_r'
+    setype: 'systemd_unit_file_t'
+    selevel: 's0'
