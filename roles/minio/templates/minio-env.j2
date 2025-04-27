@@ -1,0 +1,4 @@
+MINIO_ROOT_USER={{ minio_admin_username }}
+MINIO_ROOT_PASSWORD={{ minio_admin_password }}
+MINIO_VOLUMES="{{ minio_base_path }}/datas"
+MINIO_OPTS="--address {{ minio_bind_address }}:{{ minio_bind_port }} --console-address {{ minio_console_bind_address }}:{{ minio_console_bind_port }}"

@@ -1,0 +1,76 @@
+---
+argument_specs:
+  main:
+    author:
+      - 'Vincent FRICOU'
+    short_description: 'Install and configure Minio standalone'
+    description:
+      - "Install Minio"
+      - "Configure Minio server as standalone instance"
+    options:
+      minio_no_log:
+        type: bool
+        description: 'Enable or disable C(no_log) directive'
+        required: false
+        default: true
+      minio_version:
+        type: str
+        description:
+          - 'Minio version'
+          - 'C(latest) specify latest available version in L(Minio repository,https://dl.min.io/server/minio/release/linux-amd64/)'
+          - 'You could install specific minio version with format C(YYYY-MM-DDTHH-MM-SSZ'
+          - 'Get version from L(Minio repository,https://dl.min.io/server/minio/release/linux-amd64/) for current version'
+          - 'Get older version from L(Minio archive repository,https://dl.min.io/server/minio/release/linux-amd64/archive)'
+        required: false
+        default: 'latest'
+      minio_dl_url:
+        type: str
+        description:
+          - 'Specify exact URL where retreive Minio binary file'
+        required: false
+      minio_user:
+        type: str
+        description: 'System user run minio'
+        required: false
+        default: 'minio'
+      minio_group:
+        type: str
+        description: 'System group run minio'
+        required: false
+        default: 'minio'
+      minio_base_path:
+        type: str
+        description: 'Minio operations base path'
+        required: false
+        default: '/opt/minio'
+      minio_bind_address:
+        type: str
+        description: 'Minio bind address'
+        required: false
+        default: '0.0.0.0'
+      minio_bind_port:
+        type: int
+        description: 'Minio bind port'
+        required: false
+        default: 9000
+      minio_console_bind_address:
+        type: str
+        description: 'Minio Console bind address'
+        required: false
+        default: '0.0.0.0'
+      minio_console_bind_port:
+        type: int
+        description: 'Minio Console bind port'
+        required: false
+        default: 9001
+      minio_admin_username:
+        type: str
+        description: 'Minio admin account username'
+        required: true
+      minio_admin_password:
+        type: str
+        description: 'Minio admin account password'
+        required: true
+
+    examples: |
+      # Playbook minio deployment
