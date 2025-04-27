@@ -1,0 +1,9 @@
+---
+- name: 'preflight | Ensure required packages are installed'
+  become: true
+  tags:
+    - nginx
+    - nginx_install
+  ansible.builtin.package:
+    name: "{{ nginx_vars[ansible_os_family | lower()]['packages'] }}"
+    state: present

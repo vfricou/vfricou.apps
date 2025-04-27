@@ -1,0 +1,89 @@
+---
+- name: 'nginx | configure | Remove default vhost configuration'
+  become: true
+  tags:
+    - nginx
+    - nginx_configure
+  ansible.builtin.file:
+    path: '/etc/nginx/conf.d/default.conf'
+    state: absent
+
+- name: 'nginx | configure | Ensure required folders exists'
+  become: true
+  tags:
+    - nginx
+    - nginx_configure
+  loop:
+    - '/etc/nginx/custom/'
+    - '/etc/nginx/custom/ssl'
+    - '/etc/nginx/custom/robots'
+    - '/etc/nginx/custom/robots/configs'
+    - '/etc/nginx/custom/robots/files'
+  ansible.builtin.file:
+    path: '{{ item }}'
+    owner: 'root'
+    group: 'root'
+    mode: '0750'
+    state: directory
+
+- name: 'nginx | configure | Deploy static configurations files'
+  become: true
+  tags:
+    - nginx
+    - nginx_configure
+    - nginx_static_configs
+  loop:
+    - name: 'fastcgi_params.conf'
+      dest: 'custom'
+    - name: 'logging.conf'
+      dest: 'custom'
+    - name: 'proxy_params.conf'
+      dest: 'custom'
+    - name: 'robots_conf_disallow_all.conf'
+      dest: 'custom/robots/configs'
+    - name: 'robots_file_disallow_all.txt'
+      dest: 'custom/robots/files'
+    - name: 'security.conf'
+      dest: 'custom'
+  ansible.builtin.copy:
+    dest: "/etc/nginx/{{ item.dest }}/{{ item.name }}"
+    src: "nginx/{{ item.name }}"
+    owner: 'root'
+    group: 'root'
+    mode: '0644'
+    backup: true
+
+- name: 'nginx | configure | Deploy configurations templates'
+  become: true
+  tags:
+    - nginx
+    - nginx_configure
+    - nginx_config_files
+  loop:
+    - src: acme-location.conf.j2
+      dest: 'custom/acme-location.conf'
+
+  ansible.builtin.template:
+    dest: "/etc/nginx/{{ item.dest }}"
+    src: "etc/nginx/{{ item.src }}"
+    owner: 'root'
+    group: 'root'
+    mode: '0644'
+
+- name: 'nginx | configure | Deploy vhosts'
+  become: true
+  tags:
+    - nginx
+    - nginx_configure
+    - nginx_vhost
+  loop: "{{ nginx_vhosts }}"
+  loop_control:
+    loop_var: vhost
+  ansible.builtin.template:
+    dest: '/etc/nginx/conf.d/{{ vhost.name }}.conf'
+    src: 'etc/nginx/nginx_vhost.j2'
+    owner: 'root'
+    group: 'root'
+    mode: '0644'
+    lstrip_blocks: true
+    trim_blocks: true

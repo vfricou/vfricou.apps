@@ -1,0 +1,17 @@
+---
+nginx_vars:
+  debian:
+    repo:
+      url: 'http://nginx.org/packages/debian'
+      gpgkey: 'https://nginx.org/keys/nginx_signing.key'
+    packages:
+      - curl
+      - gnupg2
+      - ca-certificates
+      - apt-transport-https
+  redhat:
+    repo:
+      url: 'http://nginx.org/packages/centos/$releasever/$basearch/'
+      gpgkey: 'https://nginx.org/keys/nginx_signing.key'
+    packages:
+      - epel-release
