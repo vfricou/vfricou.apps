@@ -1,0 +1,74 @@
+---
+- name: 'nginx | install | Setup nginx official repository on RHEL systems'
+  become: true
+  when:
+    - ansible_os_family | lower() == 'redhat'
+  tags:
+    - nginx
+    - nginx_install
+  ansible.builtin.yum_repository:
+    name: Nginx
+    description: 'Nginx official repository'
+    baseurl: "{{ nginx_rhel_repo_url | default(nginx_vars[ansible_os_family | lower()]['repo']['url'], true) }}"
+    gpgkey: "{{ nginx_rhel_repo_gpgkey | default(nginx_vars[ansible_os_family | lower()]['repo']['gpgkey'], true) }}"
+    gpgcheck: true
+    async: false
+    module_hotfixes: true
+    enabled: true
+
+- name: 'nginx | install | Setup nginx official repository on Debian systems'
+  when:
+    - ansible_os_family | lower() == 'debian'
+  tags:
+    - nginx
+    - nginx_install
+  block:
+    - name: 'nginx | install | Debian | Ensure Nginx repository GPG Key is trusted'
+      become: true
+      ansible.builtin.apt_key:
+        url: "{{ nginx_debian_repo_gpgkey | default(nginx_vars[ansible_os_family | lower()]['repo']['gpgkey'], true) }}"
+        keyring: '/etc/apt/trusted.gpg.d/nginx.gpg'
+        state: present
+
+    - name: 'nginx | install | Debian | Add Nginx official repository'
+      become: true
+      register: __nginx_official_repo_add
+      ansible.builtin.copy:
+        content: "deb {{ nginx_debian_repo_url | default(nginx_vars[ansible_os_family | lower()]['repo']['url'], true) }} {{ ansible_distribution_release | lower() }} nginx"
+        dest: '/etc/apt/sources.list.d/nginx.list'
+        owner: 'root'
+        group: 'root'
+        mode: '0644'
+
+    - name: 'nginx | install | Debian | Update APT caches'
+      become: true
+      when:
+        - __nginx_official_repo_add.changed
+      ansible.builtin.apt:
+        update_cache: true
+        cache_valid_time: 0
+
+- name: 'nginx | install | Install nginx package'
+  become: true
+  tags:
+    - nginx
+    - nginx_install
+  ansible.builtin.package:
+    name: nginx
+    state: present
+
+- name: 'nginx | install | Ensure required folders exists'
+  become: true
+  tags:
+    - nginx
+    - nginx_install
+    - nginx_configure
+  loop:
+    - "{{ nginx_web_root }}"
+    - "{{ nginx_log_path }}"
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    owner: 'nginx'
+    group: 'adm'
+    mode: '0750'

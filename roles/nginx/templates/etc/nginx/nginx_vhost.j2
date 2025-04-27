@@ -1,0 +1,44 @@
+# vim: set syntax autoindent expandtab tabstop=2 shiftwidth=2 :
+# {{ ansible_managed }}
+
+server {
+{% for port in vhost.ports %}
+  {% if port.type == 'http' %}
+  listen {{ port.port }};
+  {% else %}
+  listen {{ port.port }} {{ port.options | join (' ') }};
+  {% endif %}
+{% endfor %}
+  {% for fqdn in vhost.server_names %}
+  server_name {{ fqdn }};
+  {% endfor %}
+
+  access_log {{ vhost.logs | default(nginx_log_path + '/vhosts', true) }}/{{ vhost.name }}.access.log combined;
+  access_log {{ vhost.logs | default(nginx_log_path + '/vhosts', true) }}/{{ vhost.name }}.extend.log extended_infos;
+  access_log {{ vhost.logs | default(nginx_log_path + '/vhosts', true) }}/{{ vhost.name }}.error.log warn;
+  access_log {{ vhost.logs | default(nginx_log_path + '', true) }}/access.log vhost_combined;
+
+  {% if 'robots' in vhost.include and vhost.include.robots %}
+  include /etc/nginx/custom/robots/configs/robots_conf_disallow_all.conf;
+
+  {% endif %}
+  {% if 'letsencrypt' in vhost.include and vhost.include.letsencrypt %}
+  include /etc/nginx/custom/acme-location.conf;
+
+  {% endif %}
+  {% if 'redirect_https' in vhost.include and vhost.include.redirect_https %}
+  if ($scheme = http) {
+    return 301 https://$http_host$request_uri;
+  }
+
+  {% endif %}
+  location ~* \.(?:git|svn|hg) {
+    deny all;
+  }
+  {% if 'custom' in vhost %}
+    {{ vhost.custom | indent(2) }}
+  {% endif %}
+}
+
+
+

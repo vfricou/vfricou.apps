@@ -1,0 +1,3 @@
+---
+nginx_log_path: '/var/log/nginx'
+nginx_web_root: '/srv/nginx'

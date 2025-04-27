@@ -1,0 +1,9 @@
+---
+- name: 'Go to preflight tasks'
+  ansible.builtin.import_tasks: preflight.yml
+
+- name: 'Go to nginx install'
+  ansible.builtin.import_tasks: nginx/install.yml
+
+- name: 'Go to nginx configure'
+  ansible.builtin.import_tasks: nginx/configure.yml
