@@ -74,3 +74,15 @@ argument_specs:
 
     examples: |
       # Playbook minio deployment
+      ---
+      - name: 'Minio'
+        hosts:
+          - s3
+        vars:
+          minio_admin_username: '<vaulted_minio_admin_username>'
+          minio_admin_password: '<vaulted_minio_admin_password>'
+        roles:
+          - role: vfricou.apps.minio
+            vars:
+              minio_admin_username: "{{ __vault_minio_datas.data.data.username }}"
+              minio_admin_password: "{{ __vault_minio_datas.data.data.password }}"
