@@ -1,3 +1,11 @@
 ---
 nginx_log_path: '/var/log/nginx'
 nginx_web_root: '/srv/nginx'
+nginx_logrotate_general_retention: 90
+nginx_logrotate_vhost_retention: 90
+nginx_worker_connections: 1024
+nginx_conf_sendfile: true
+nginx_conf_tcp_nopush: false
+nginx_conf_keepalive_timeout: 65
+nginx_conf_gzip_compression: false
+nginx_conf_dh_size: 2048

@@ -1,0 +1,32 @@
+user  nginx;
+worker_processes  auto;
+
+error_log  {{ nginx_log_path }}/error.log notice;
+pid        /run/nginx.pid;
+
+events {
+    worker_connections  {{ nginx_worker_connections }};
+}
+
+http {
+    include            /etc/nginx/mime.types;
+    default_type       application/octet-stream;
+
+    include            /etc/nginx/custom/logging.conf;
+    include            /etc/nginx/custom/security.conf;
+
+    access_log         /var/log/nginx/access.log  combined;
+
+    {% if nginx_conf_sendfile %}
+    sendfile           on;
+    {% endif %}
+    {% if nginx_conf_tcp_nopush %}
+    tcp_nopush         on;
+    {% endif %}
+    keepalive_timeout  {{ nginx_conf_keepalive_timeout }};
+    {% if nginx_conf_gzip_compression %}
+    gzip  on;
+    {% endif %}
+
+    include /etc/nginx/conf.d/*.conf;
+}

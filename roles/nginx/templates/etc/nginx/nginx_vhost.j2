@@ -2,31 +2,50 @@
 # {{ ansible_managed }}
 
 server {
-{% for port in vhost.ports %}
+{% for port in __vhost.ports %}
   {% if port.type == 'http' %}
   listen {{ port.port }};
-  {% else %}
-  listen {{ port.port }} {{ port.options | join (' ') }};
+  {% elif port.type == 'https' %}
+  listen {{ port.port }} {{ port.opts | join (' ') }};
+  {% if port.http2 %}
+  http2 on;
+  {% endif %}
   {% endif %}
 {% endfor %}
-  {% for fqdn in vhost.server_names %}
-  server_name {{ fqdn }};
-  {% endfor %}
+  server_name {{ __vhost.server_names | join (' ') }};
+  {% if 'ssl_opts' in __vhost and 'enabled' in __vhost.ssl_opts and __vhost.ssl_opts.enabled %}
+  ssl_certificate  {{ __vhost.ssl_opts.cert_path }};
+  ssl_certificate_key {{ __vhost.ssl_opts.key_path }};
+  ssl_trusted_certificate {{ __vhost.ssl_opts.chain_path }};
 
-  access_log {{ vhost.logs | default(nginx_log_path + '/vhosts', true) }}/{{ vhost.name }}.access.log combined;
-  access_log {{ vhost.logs | default(nginx_log_path + '/vhosts', true) }}/{{ vhost.name }}.extend.log extended_infos;
-  access_log {{ vhost.logs | default(nginx_log_path + '/vhosts', true) }}/{{ vhost.name }}.error.log warn;
-  access_log {{ vhost.logs | default(nginx_log_path + '', true) }}/access.log vhost_combined;
+  ssl_protocols {{ __vhost.ssl_opts.protocols | default(nginx_confs['ssl']['protocols'], true) | join(' ') }};
+  {% if 'hsts' in __vhost.ssl_opts and __vhost.ssl_opts.hsts %}
+  add_header Strict-Transport-Security "{{ __vhost.ssl_opts.hsts_confs | default(nginx_confs['ssl']['hsts_conf'], true) }}";
+  {% endif %}
+  ssl_ciphers {{ __vhost.ssl_opts.ciphers | default(nginx_confs['ssl']['ciphers']) | join(':') }};
+  ssl_dhparam /etc/nginx/custom/ssl/dh.pem;
+  ssl_ecdh_curve {{ __vhost.ssl_opts.ciphers | default(nginx_confs['ssl']['ecdh_curve'], true) | join(':') }};
+  ssl_prefer_server_ciphers on;
+  ssl_session_cache shared:SSL:{{ __vhost.ssl_opts.session_cache_time | default(nginx_confs['ssl']['session_cache_time'], true) }};
+  ssl_session_timeout {{ __vhost.ssl_opts.session_cache_time | default(nginx_confs['ssl']['session_cache_timeout'], true) }};
+  ssl_session_tickets {{ __vhost.ssl_opts.session_cache_time | default(nginx_confs['ssl']['session_ticket'], true) }};
+  ssl_buffer_size {{ __vhost.ssl_opts.session_cache_time | default(nginx_confs['ssl']['session_buffer_size'], true) }};
 
-  {% if 'robots' in vhost.include and vhost.include.robots %}
+  {% endif %}
+  access_log {{ __vhost.logs | default(nginx_log_path + '/vhosts', true) }}/{{ __vhost.name }}.access.log combined;
+  access_log {{ __vhost.logs | default(nginx_log_path + '/vhosts', true) }}/{{ __vhost.name }}.extend.log extended_infos;
+  error_log {{ __vhost.logs | default(nginx_log_path + '/vhosts', true) }}/{{ __vhost.name }}.error.log warn;
+  access_log {{ __vhost.logs | default(nginx_log_path + '', true) }}/access.log vhost_combined;
+
+  {% if 'robots' in __vhost.include and __vhost.include.robots %}
   include /etc/nginx/custom/robots/configs/robots_conf_disallow_all.conf;
 
   {% endif %}
-  {% if 'letsencrypt' in vhost.include and vhost.include.letsencrypt %}
+  {% if 'letsencrypt' in __vhost.include and __vhost.include.letsencrypt %}
   include /etc/nginx/custom/acme-location.conf;
 
   {% endif %}
-  {% if 'redirect_https' in vhost.include and vhost.include.redirect_https %}
+  {% if 'redirect_https' in __vhost.include and __vhost.include.redirect_https %}
   if ($scheme = http) {
     return 301 https://$http_host$request_uri;
   }
@@ -35,8 +54,8 @@ server {
   location ~* \.(?:git|svn|hg) {
     deny all;
   }
-  {% if 'custom' in vhost %}
-    {{ vhost.custom | indent(2) }}
+  {% if 'custom' in __vhost %}
+    {{ __vhost.custom | indent(2) }}
   {% endif %}
 }
 
