@@ -1,0 +1,239 @@
+---
+argument_specs:
+  main:
+    author:
+      - 'Vincent FRICOU'
+    short_description: 'Install and configure Nginx'
+    description:
+      - 'Install Nginx'
+      - 'Manage Nginx general configuration'
+      - 'Manage Nginx vhosts configuration'
+      - 'Manage Nginx logrotate configuration'
+    options:
+      nginx_log_path:
+        type: str
+        description: 'Nginx logs location base path'
+        required: false
+        default: '/var/log/nginx'
+      nginx_web_root:
+        type: str
+        description:
+          - 'Nginx web root location'
+          - 'Used for ACME challenges'
+        required: false
+        default: '/srv/nginx'
+      nginx_logrotate_general_retention:
+        type: int
+        description: 'Logrotation for general nginx logs'
+        required: false
+        default: 90
+      nginx_logrotate_vhost_retention:
+        type: int
+        description: 'Logrotate for vhosts'
+        required: false
+        default: 90
+      nginx_worker_connnections:
+        type: int
+        description: 'Workers max connections'
+        required: false
+        default: 1024
+      nginx_conf_sendfile:
+        type: bool
+        description: 'Enable C(sendfile) directive in Nginx general configuration'
+        required: false
+        default: true
+      nginx_conf_tcp_nopush:
+        type: bool
+        description: 'Enable C(tcp_nopush) directive in Nginx general configuration'
+        required: false
+        default: false
+      nginx_conf_keepalive_timeout:
+        type: int
+        description: 'Configure C(keepalive_timeout) directive in Nginx general configuration'
+        required: false
+        default: 65
+      nginx_conf_gzip_compression:
+        type: bool
+        description: 'Enable C(gzip) directive in Nginx general configuration'
+        required: false
+        default: false
+      nginx_conf_dh_size:
+        type: int
+        description: 'Diffie Hellman size in bits'
+        required: false
+        default: 2048
+      nginx_vhosts:
+        type: list
+        elements: dict
+        description: 'Nginx vhosts configurations'
+        required: true
+        options:
+          name:
+            type: str
+            description: 'vhost configuration filename'
+            required: true
+          server_names:
+            type: list
+            elements: str
+            description: 'Server names'
+            required: true
+          ports:
+            type: list
+            elements: dict
+            description: 'Ports configuration'
+            required: true
+            options:
+              port:
+                type: int
+                description: 'Port to bind'
+                required: true
+              type:
+                type: str
+                description: 'Port type'
+                required: true
+                choices:
+                  - http
+                  - https
+              http2:
+                type: bool
+                description: 'Enable http2 directive for SSL vhosts'
+                required: false
+              opts:
+                type: list
+                elements: str
+                description: 'HTTPS listen directive options'
+                required: false
+          ssl_opts:
+            type: dict
+            description: 'vhost configuration options'
+            required: false
+            options:
+              enabled:
+                type: bool
+                description: 'Enable SSL configurations on vhost'
+                required: true
+              cert_path:
+                type: str
+                description: 'Path to vhost certificate fullchain'
+                required: true
+              key_path:
+                type: str
+                description: 'Path to vhost private key'
+                required: true
+              chain_path:
+                type: str
+                description: 'Path to trusted CA chain'
+                required: true
+              protocols:
+                type: list
+                elements: str
+                description: 'Protocols to use with SSL enabled'
+                required: false
+                default:
+                  - TLSv1.2
+                  - TLSv1.3
+              hsts:
+                type: bool
+                description: 'Enable HSTS headers'
+                required: false
+                default: true
+              hsts_conf:
+                type: str
+                description: 'HSTS configurations options'
+                required: false
+                default: 'max-age=157680000;includeSubDomains'
+              ciphers:
+                type: list
+                elements: str
+                description: 'Ciphers to use on vhost'
+                required: false
+                default:
+                  - 'ECDHE-ECDSA-AES256-GCM-SHA384'
+                  - 'ECDHE-ECDSA-CHACHA20-POLY1305'
+                  - 'ECDHE-ECDSA-CHACHA20-POLY1305-D'
+                  - 'ECDHE-RSA-AES256-GCM-SHA384'
+                  - 'ECDHE-RSA-CHACHA20-POLY1305'
+                  - 'ECDHE-RSA-CHACHA20-POLY1305-D'
+                  - 'ECDHE-ECDSA-AES128-GCM-SHA256'
+                  - 'ECDHE-RSA-AES128-GCM-SHA256'
+                  - '!aNULL'
+                  - '!eNULL'
+                  - '!EXPORT'
+                  - '!DES'
+                  - '!MD5'
+                  - '!PSK'
+                  - '!RC4'
+              ecdh_curve:
+                type: list
+                elements: str
+                description: 'ECDH curves to use'
+                required: false
+                default:
+                  - 'secp521r1'
+                  - 'secp384r1'
+              session_cache_time:
+                type: str
+                description: 'Session cache validity'
+                required: false
+                default: '10m'
+              session_cache_timeout:
+                type: str
+                description: 'Session cache timeout'
+                required: false
+                default: '8h'
+              session_ticket:
+                type: str
+                description: 'Activate session tickets'
+                required: false
+                default: 'off'
+                choices:
+                  - 'on'
+                  - 'off'
+              session_buffer_size:
+                type: str
+                description: 'Session buffer'
+                required: false
+                default: 1400
+          logs:
+            type: str
+            description: 'vhost logs path'
+            required: false
+            default: 'C(<nginx_log_path>)/vhosts/C(vhost.name)'
+          include:
+            type: dict
+            description: 'Configuration inclusion declarations'
+            required: false
+            options:
+              robots:
+                type: bool
+                description: 'Enable global robots.txt files (refuse all robots)'
+                required: false
+              letsencrypt:
+                type: bool
+                description: 'Enable ACME location block to allow ACME challenges verifications'
+                required: false
+              redirect_https:
+                type: bool
+                description: 'Enable HTTS redirection'
+                required: false
+          custom:
+            type: str
+            description:
+              - 'Nginx vhost custom configurations'
+              - 'Use this to declare you location blocks'
+            required: true
+
+    examples: |
+      # Playbook minio deployment
+      ---
+      - name: 'Minio'
+        hosts:
+          - s3
+        vars:
+          minio_admin_username: '<vaulted_minio_admin_username>'
+          minio_admin_password: '<vaulted_minio_admin_password>'
+        roles:
+          - role: vfricou.apps.minio
+            vars:
+              minio_admin_username: "{{ __vault_minio_datas.data.data.username }}"
+              minio_admin_password: "{{ __vault_minio_datas.data.data.password }}"

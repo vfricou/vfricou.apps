@@ -21,4 +21,5 @@ build_ignore: []
 
 tags: []
 
-dependencies: {}
+dependencies:
+  community.crypto: '>=2.26.1'

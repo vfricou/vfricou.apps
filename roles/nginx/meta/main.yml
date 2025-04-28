@@ -1,0 +1,30 @@
+---
+galaxy_info:
+  role_name: "nginx"
+  author: "Vincent FRICOU"
+  namespace: "vfricou"
+  description: |
+    Install Nginx
+    Manage Nginx general configuration
+    Manage Nginx vhosts configuration
+    Manage Nginx logrotate configuration
+  issue_tracker_url: "https://github.com/vfricou/vfricou.apps/issues"
+  license: "AGPL-3.0-only"
+  min_ansible_version: "2.9"
+  platforms:
+    - name: "EL"
+      versions:
+        - '7'
+        - '8'
+        - '9'
+    - name: "Debian"
+      versions:
+        - 'buster'
+        - 'bullseye'
+    - name: "Ubuntu"
+      versions:
+        - 'bionic'
+        - 'focal'
+        - 'impish'
+
+collections: []

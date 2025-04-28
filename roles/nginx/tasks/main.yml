@@ -7,3 +7,6 @@
 
 - name: 'Go to nginx configure'
   ansible.builtin.import_tasks: nginx/configure.yml
+
+- name: 'Go to logrotate tasks'
+  ansible.builtin.import_tasks: logrotate.yml

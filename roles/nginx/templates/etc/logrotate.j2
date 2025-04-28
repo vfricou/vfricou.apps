@@ -1,4 +1,4 @@
-/var/log/nginx/*.log {
+{{ nginx_log_path }}/*.log {
         daily
         missingok
         rotate {{ nginx_logrotate_general_retention }}
@@ -13,7 +13,7 @@
                 fi
         endscript
 }
-/var/log/nginx/vhost/*.log {
+{{ nginx_log_path }}/vhosts/*.log {
         daily
         missingok
         rotate {{ nginx_logrotate_vhost_retention }}
@@ -21,7 +21,7 @@
         notifempty
         create 640 nginx adm
         sharedscripts
-        olddir {{ nginx_log_path }}/archives/vhost
+        olddir {{ nginx_log_path }}/archives/vhosts
         postrotate
                 if [ -f /var/run/nginx.pid ]; then
                         kill -USR1 `cat /var/run/nginx.pid`

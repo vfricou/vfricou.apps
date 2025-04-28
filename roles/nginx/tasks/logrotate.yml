@@ -1,0 +1,14 @@
+---
+- name: 'logrotate | Deploy logrotate configuration'
+  become: true
+  tags:
+    - nginx
+    - nginx_install
+    - nginx_configure
+    - nginx_logrotate
+  ansible.builtin.template:
+    dest: '/etc/logrotate.d/nginx'
+    src: 'etc/logrotate.j2'
+    owner: 'root'
+    group: 'root'
+    mode: '0644'
