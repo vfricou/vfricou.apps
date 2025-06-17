@@ -6,13 +6,19 @@
 - name: 'Import prepare tasks'
   when:
     - not __vlog_bin_stat.stat.exists | bool
-    - victorialogs_version not in __vlog_current_version.stdout
+    - (__vlog_current_version.stdout is defined and victorialogs_version not in __vlog_current_version.stdout) or
+      (__vlog_bin_stat is defined and not __vlog_bin_stat.stat.exists)
   ansible.builtin.import_tasks:
     file: prepare.yml
 
 - name: 'Import install tasks'
   when:
     - not __vlog_bin_stat.stat.exists | bool
-    - victorialogs_version not in __vlog_current_version.stdout
+    - (__vlog_current_version.stdout is defined and victorialogs_version not in __vlog_current_version.stdout) or
+      (__vlog_bin_stat is defined and not __vlog_bin_stat.stat.exists)
   ansible.builtin.import_tasks:
     file: install.yml
+
+- name: 'Import configure tasks'
+  ansible.builtin.import_tasks:
+    file: configure.yml

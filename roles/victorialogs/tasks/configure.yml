@@ -1,6 +1,10 @@
 ---
 - name: 'configure | Deploy systemd unit'
   become: true
+  notify: 'Restart VictoriaLogs'
+  tags:
+    - victorialogs
+    - victorialogs_configure
   ansible.builtin.template:
     dest: '/etc/systemd/system/victorialogs.service'
     src: victorialogs.service.j2

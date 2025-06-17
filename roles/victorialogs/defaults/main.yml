@@ -10,3 +10,5 @@ victorialogs_retention: 30
 victorialogs_args:
   storageDataPath: "{{ victorialogs_data_dir }}"
   retentionPeriod: "{{ victorialogs_retention }}"
+  insert.concurrency: 5
+  memory.allowedPercent: 60

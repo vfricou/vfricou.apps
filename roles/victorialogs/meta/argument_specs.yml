@@ -53,3 +53,7 @@ argument_specs:
         description: 'VictoriaLogs extra environment configurations'
         required: false
         default:
+          storageDataPath: "{{ victorialogs_data_dir }}"
+          retentionPeriod: "{{ victorialogs_retention }}"
+          insert.concurrency: 5
+          memory.allowedPercent: 60

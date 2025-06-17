@@ -7,16 +7,13 @@ After=network.target
 [Service]
 Type=simple
 WorkingDirectory={{ victorialogs_base_path }}
-{% if victorialogs_env | lenght > 0 %}
-EnvironmentFile={{ victorialogs.env_file }}
-{% endif %}
 SyslogIdentifier=victorialogs
 LimitNOFILE=2097152
 User={{ victorialogs_user }}
 Group={{ victorialogs_group }}
 ExecStart=/usr/local/bin/vlog {% for arg, arg_value in victorialogs_args.items() %}-{{ arg }}={{ arg_value }} {% endfor %}
-Restart=always
 
+Restart=always
 PrivateTmp=yes
 ProtectHome=yes
 NoNewPrivileges=yes

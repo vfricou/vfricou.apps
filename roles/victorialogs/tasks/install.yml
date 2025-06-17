@@ -10,15 +10,16 @@
     state: directory
     prefix: vlog
 
-- name: 'install | Download binary'
+- name: 'install | Unarchive binary'
   become: true
   tags:
     - victorialogs
     - victorialogs_upgrade
     - victorialogs_install
   ansible.builtin.unarchive:
-    dest: "{{ __dl_tmp_folder }}"
-    src: "{{ victorialogs_dl_url }}"
+    dest: "{{ __dl_tmp_folder.path }}"
+    src: "{{ victorialogs_dl_url }}/{{ victorialogs_pkg_name }}"
+    remote_src: true
     owner: 'root'
     group: 'root'
 

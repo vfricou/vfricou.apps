@@ -6,6 +6,7 @@
     - victorialogs
     - victorialogs_install
     - victorialogs_upgrade
+    - victorialogs_configure
   ansible.builtin.stat:
     path: "{{ victorialogs.bin_path }}"
 
@@ -18,5 +19,6 @@
     - victorialogs
     - victorialogs_install
     - victorialogs_upgrade
+    - victorialogs_configure
   ansible.builtin.command: "{{ victorialogs.bin_path }} --version"
 
