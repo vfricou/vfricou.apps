@@ -1,0 +1,29 @@
+{{ ansible_managed | comment }}
+
+[Unit]
+Description=Description=VictoriaLogs Single
+After=network.target
+
+[Service]
+Type=simple
+WorkingDirectory={{ victorialogs_base_path }}
+{% if victorialogs_env | lenght > 0 %}
+EnvironmentFile={{ victorialogs.env_file }}
+{% endif %}
+SyslogIdentifier=victorialogs
+LimitNOFILE=2097152
+User={{ victorialogs_user }}
+Group={{ victorialogs_group }}
+ExecStart=/usr/local/bin/vlog {% for arg, arg_value in victorialogs_args.items() %}-{{ arg }}={{ arg_value }} {% endfor %}
+Restart=always
+
+PrivateTmp=yes
+ProtectHome=yes
+NoNewPrivileges=yes
+ProtectSystem=full
+ProtectControlGroups=true
+ProtectKernelModules=true
+ProtectKernelTunables=yes
+
+[Install]
+WantedBy=multi-user.target

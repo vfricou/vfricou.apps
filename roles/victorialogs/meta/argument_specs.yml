@@ -1,0 +1,55 @@
+---
+argument_specs:
+  main:
+    author:
+      - 'Vincent FRICOU'
+    short_description: 'Install and configure VictoriaLogs Single'
+    description:
+      - 'Install VictoriaLogs'
+      - 'Configure VictoriaLogs'
+    options:
+      victorialogs_group:
+        type: str
+        description: 'VictoriaLogs system group'
+        required: false
+        default: 'vlog'
+      victorialogs_user:
+        type: str
+        description: 'VictoriaLogs system user'
+        required: false
+        default: 'vlog'
+      victorialogs_base_path:
+        type: str
+        description: 'VictoriaLogs base working directory'
+        required: false
+        default: '/opt/vlog'
+      victorialogs_data_dir:
+        type: str
+        description: 'VictoriaLogs data directory'
+        required: false
+        default: "{{ victorialogs_base_path }}/data"
+      victorialogs_version:
+        type: str
+        description: 'VictoriaLogs version'
+        required: false
+        default: ''
+      victorialogs_dl_url:
+        type: str
+        description: 'Download base URL'
+        required: false
+        default: "https://github.com/VictoriaMetrics/VictoriaMetrics/releases/download/{{ victorialogs_version }}-victorialogs"
+      victorialogs_pkg_name:
+        type: str
+        description: 'Package name'
+        required: false
+        default: "victoria-logs-linux-amd64-{{ victorialogs_version }}-victorialogs.tar.gz"
+      victorialogs_retention:
+        type: int
+        description: 'VictoriaLogs retention periods (days)'
+        required: false
+        default: 30
+      victorialogs_args:
+        type: dict
+        description: 'VictoriaLogs extra environment configurations'
+        required: false
+        default:

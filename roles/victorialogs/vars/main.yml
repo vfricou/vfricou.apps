@@ -1,0 +1,4 @@
+---
+victorialogs:
+  bin_path: '/usr/local/bin/vlog'
+  env_file: '/etc/default/victorialogs'

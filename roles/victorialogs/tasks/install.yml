@@ -1,0 +1,51 @@
+---
+- name: 'install | Generate temporary download folder'
+  become: true
+  register: __dl_tmp_folder
+  tags:
+    - victorialogs
+    - victorialogs_upgrade
+    - victorialogs_install
+  ansible.builtin.tempfile:
+    state: directory
+    prefix: vlog
+
+- name: 'install | Download binary'
+  become: true
+  tags:
+    - victorialogs
+    - victorialogs_upgrade
+    - victorialogs_install
+  ansible.builtin.unarchive:
+    dest: "{{ __dl_tmp_folder }}"
+    src: "{{ victorialogs_dl_url }}"
+    owner: 'root'
+    group: 'root'
+
+- name: 'install | Copy binary'
+  become: true
+  tags:
+    - victorialogs
+    - victorialogs_upgrade
+    - victorialogs_install
+  ansible.builtin.copy:
+    remote_src: true
+    dest: "{{ victorialogs.bin_path }}"
+    src: "{{ __dl_tmp_folder.path }}/victoria-logs-prod"
+    owner: "{{ victorialogs_user }}"
+    group: "{{ victorialogs_group }}"
+    mode: "0750"
+    seuser: 'system_u'
+    serole: 'object_r'
+    setype: 'bin_t'
+    selevel: 's0'
+
+- name: 'install | Cleanup temporary folder'
+  become: true
+  tags:
+    - victorialogs
+    - victorialogs_upgrade
+    - victorialogs_install
+  ansible.builtin.file:
+    path: "{{ __dl_tmp_folder.path }}"
+    state: absent

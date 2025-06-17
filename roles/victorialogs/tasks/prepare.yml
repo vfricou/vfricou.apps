@@ -1,0 +1,41 @@
+---
+- name: 'prepare | Ensure VictoriaLogs system group exist'
+  become: true
+  tags:
+    - victorialogs
+    - victorialogs_install
+  ansible.builtin.group:
+    name: "{{ victorialogs_group }}"
+    state: present
+    system: true
+
+- name: 'prepare | Ensure VictoriaLogs system user exist'
+  become: true
+  tags:
+    - victorialogs
+    - victorialogs_install
+  ansible.builtin.user:
+    name: "{{ victorialogs_user }}"
+    comment: 'VictoriaLogs system user'
+    system: true
+    password_lock: true
+    create_home: true
+    home: "{{ victorialogs_base_path }}"
+    state: present
+
+- name: 'prepare | Ensure specific directories have good rights'
+  become: true
+  tags:
+    - victorialogs
+    - victorialogs_install
+    - victorialogs_configure
+    - victorialogs_upgrade
+  loop:
+    - "{{ victorialogs_base_path }}"
+    - "{{ victorialogs_data_dir }}"
+  ansible.builtin.file:
+    path: "{{ item }}"
+    owner: "{{ victorialogs_user }}"
+    group: "{{ victorialogs_group }}"
+    mode: '0750'
+    state: directory

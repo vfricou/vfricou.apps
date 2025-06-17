@@ -1,0 +1,12 @@
+---
+victorialogs_version: 'v1.23.3'
+victorialogs_group: 'vlog'
+victorialogs_user: 'vlog'
+victorialogs_base_path: '/opt/vlog'
+victorialogs_data_dir: "{{ victorialogs_base_path }}/data"
+victorialogs_dl_url: "https://github.com/VictoriaMetrics/VictoriaMetrics/releases/download/{{ victorialogs_version }}-victorialogs"
+victorialogs_pkg_name: "victoria-logs-linux-amd64-{{ victorialogs_version }}-victorialogs.tar.gz"
+victorialogs_retention: 30
+victorialogs_args:
+  storageDataPath: "{{ victorialogs_data_dir }}"
+  retentionPeriod: "{{ victorialogs_retention }}"

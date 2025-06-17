@@ -1,0 +1,8 @@
+---
+- name: 'Restart VictoriaLogs'
+  become: true
+  ansible.builtin.systemd:
+    name: 'victorialogs'
+    enabled: true
+    state: restarted
+    daemon_reload: true

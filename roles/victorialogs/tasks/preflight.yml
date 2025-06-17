@@ -1,0 +1,22 @@
+---
+- name: 'preflight | Stat if VictoriaLogs already installed'
+  become: true
+  register: __vlog_bin_stat
+  tags:
+    - victorialogs
+    - victorialogs_install
+    - victorialogs_upgrade
+  ansible.builtin.stat:
+    path: "{{ victorialogs.bin_path }}"
+
+- name: 'preflight | Check current VictoriaLogs version'
+  become: true
+  changed_when: false
+  register: __vlog_current_version
+  when: __vlog_bin_stat.stat.exists | bool
+  tags:
+    - victorialogs
+    - victorialogs_install
+    - victorialogs_upgrade
+  ansible.builtin.command: "{{ victorialogs.bin_path }} --version"
+

@@ -1,0 +1,18 @@
+---
+- name: 'Import preflight tasks'
+  ansible.builtin.import_tasks:
+    file: preflight.yml
+
+- name: 'Import prepare tasks'
+  when:
+    - not __vlog_bin_stat.stat.exists | bool
+    - victorialogs_version not in __vlog_current_version.stdout
+  ansible.builtin.import_tasks:
+    file: prepare.yml
+
+- name: 'Import install tasks'
+  when:
+    - not __vlog_bin_stat.stat.exists | bool
+    - victorialogs_version not in __vlog_current_version.stdout
+  ansible.builtin.import_tasks:
+    file: install.yml
