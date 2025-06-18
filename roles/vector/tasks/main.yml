@@ -1,0 +1,24 @@
+---
+- name: 'Import preflight tasks'
+  ansible.builtin.import_tasks:
+    file: preflight.yml
+
+- name: 'Import prepare tasks'
+  when:
+    - not __vector_bin_stat.stat.exists | bool
+    - (__vector_current_version.stdout is defined and vector_version not in __vector_current_version.stdout) or
+      (__vector_bin_stat is defined and not __vector_bin_stat.stat.exists)
+  ansible.builtin.import_tasks:
+    file: prepare.yml
+
+- name: 'Import install tasks'
+  when:
+    - not __vector_bin_stat.stat.exists | bool
+    - (__vector_current_version.stdout is defined and vector_version not in __vector_current_version.stdout) or
+      (__vector_bin_stat is defined and not __vector_bin_stat.stat.exists)
+  ansible.builtin.import_tasks:
+    file: install.yml
+
+- name: 'Import configure tasks'
+  ansible.builtin.import_tasks:
+    file: configure.yml

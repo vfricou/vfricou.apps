@@ -1,0 +1,24 @@
+---
+- name: 'preflight | Stat if Vector already installed'
+  become: true
+  register: __vector_bin_stat
+  tags:
+    - vector
+    - vector_install
+    - vector_upgrade
+    - vector_configure
+  ansible.builtin.stat:
+    path: "{{ vector.bin_path }}"
+
+- name: 'preflight | Check current Vector version'
+  become: true
+  changed_when: false
+  register: __vector_current_version
+  when: __vector_bin_stat.stat.exists | bool
+  tags:
+    - vector
+    - vector_install
+    - vector_upgrade
+    - vector_configure
+  ansible.builtin.command: "{{ vector.bin_path }} --version"
+

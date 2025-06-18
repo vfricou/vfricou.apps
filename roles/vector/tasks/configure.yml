@@ -1,0 +1,27 @@
+---
+- name: 'configure | Deploy systemd unit'
+  become: true
+  notify: 'Restart Vector'
+  tags:
+    - vector
+    - vector_configure
+    - vector_install
+  ansible.builtin.template:
+    dest: '/etc/systemd/system/vector.service'
+    src: vector.service.j2
+    owner: 'root'
+    group: 'root'
+    mode: '0644'
+
+- name: 'configure | Deploy Vector configuration'
+  become: true
+  notify: 'Restart Vector'
+  tags:
+    - vector
+    - vector_configure
+  ansible.builtin.template:
+    dest: "{{ vector_base_path }}/config.yaml"
+    src: vector.conf.j2
+    owner: 'root'
+    group: 'root'
+    mode: '0640'

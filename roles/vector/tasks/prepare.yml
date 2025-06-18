@@ -1,0 +1,17 @@
+---
+- name: 'prepare | Ensure specific directories have good rights'
+  become: true
+  tags:
+    - vector
+    - vector_install
+    - vector_configure
+    - vector_upgrade
+  loop:
+    - "{{ vector_base_path }}"
+    - "{{ vector_data_dir }}"
+  ansible.builtin.file:
+    path: "{{ item }}"
+    owner: 'root'
+    group: 'root'
+    mode: '0750'
+    state: directory

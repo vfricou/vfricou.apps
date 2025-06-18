@@ -1,0 +1,39 @@
+---
+vector_version: '0.47.0'
+vector_base_path: '/opt/vector'
+vector_data_dir: '/var/lib/vector'
+vector_dl_url: "https://packages.timber.io/vector/{{ vector_version }}"
+vector_pkg_name: "vector-{{ vector_version }}-x86_64-unknown-linux-musl.tar.gz"
+#vector_conf_source:
+#  syslog:
+#    type: journald
+#    current_boot_only: true
+#vector_conf_sinks:
+#  loki_syslog:
+#    type: loki
+#    compression: "none"
+#    out_of_order_action: "accept"
+#    remove_label_fields: true
+#    labels:
+#      instance: "<instance_name>"
+#      type: "syslog"
+#      {% raw %}
+#      _msg: "{{ message }}"
+#      {% endraw %}
+#    inputs:
+#      - syslog
+#    endpoint: "http://<loki_addr>:3100>"
+#    healthcheck:
+#      enabled: false
+#    encoding:
+#      codec: "json"
+#    request:
+#      concurrency: 10
+#      rate_limit_num: 500
+#      retry_attempts: 3
+#  console:
+#    type: console
+#    inputs:
+#      - syslog
+#    encoding:
+#      codec: "json"

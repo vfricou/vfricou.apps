@@ -1,0 +1,10 @@
+{{ ansible_managed | comment }}
+sources:
+  {{ vector_conf_sources | indent(2) }}
+{% if vector_conf_transforms is defined %}
+transforms:
+  {{ vector_conf_transforms | indent(2) }}
+{% endif %}
+sinks:
+  {{ vector_conf_sinks | indent(2) }}
+

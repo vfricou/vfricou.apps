@@ -1,0 +1,47 @@
+---
+argument_specs:
+  main:
+    author:
+      - 'Vincent FRICOU'
+    short_description: 'Install and configure Vector'
+    description:
+      - 'Install Vector'
+      - 'Configure Vector'
+    options:
+      vector_base_path:
+        type: str
+        description: 'Vector base working directory'
+        required: false
+        default: '/opt/vector'
+      vector_data_dir:
+        type: str
+        description: 'Vector data directory'
+        required: false
+        default: '/var/lib/vector'
+      vector_version:
+        type: str
+        description: 'Vector version'
+        required: false
+        default: '0.47.0'
+      vector_dl_url:
+        type: str
+        description: 'Download base URL'
+        required: false
+        default: "https://packages.timber.io/vector/{{ vector_version }}"
+      vector_pkg_name:
+        type: str
+        description: 'Package name'
+        required: false
+        default: "vector-{{ vector_version }}-x86_64-unknown-linux-musl.tar.gz"
+      vector_conf_sources:
+        type: str
+        description: 'Vector sources section configurations'
+        required: true
+      vector_conf_transforms:
+        type: str
+        description: 'Vector sources section configurations'
+        required: false
+      vector_conf_sinks:
+        type: str
+        description: 'Vector sources section configurations'
+        required: true

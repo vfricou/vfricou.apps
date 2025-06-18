@@ -1,0 +1,54 @@
+---
+- name: 'install | Generate temporary download folder'
+  become: true
+  register: __dl_tmp_folder
+  tags:
+    - vector
+    - vector_upgrade
+    - vector_install
+  ansible.builtin.tempfile:
+    state: directory
+    prefix: vlog
+
+- name: 'install | Unarchive binary'
+  become: true
+  tags:
+    - vector
+    - vector_upgrade
+    - vector_install
+  ansible.builtin.unarchive:
+    dest: "{{ __dl_tmp_folder.path }}"
+    src: "{{ vector_dl_url }}/{{ vector_pkg_name }}"
+    remote_src: true
+    owner: 'root'
+    group: 'root'
+
+- name: 'install | Copy binary'
+  become: true
+  tags:
+    - vector
+    - vector_upgrade
+    - vector_install
+  ansible.builtin.copy:
+    remote_src: true
+    dest: "{{ vector.bin_path }}"
+    src: "{{ __dl_tmp_folder.path }}/vector-x86_64-unknown-linux-musl/bin/vector"
+    owner: 'root'
+    group: 'root'
+    mode: "0750"
+    seuser: 'system_u'
+    serole: 'object_r'
+    setype: 'bin_t'
+    selevel: 's0'
+
+- name: 'install | Cleanup temporary folder'
+  become: true
+  tags:
+    - vector
+    - vector_upgrade
+    - vector_install
+  ansible.builtin.file:
+    path: "{{ __dl_tmp_folder.path }}"
+    state: absent
+
+
