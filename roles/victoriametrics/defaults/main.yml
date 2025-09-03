@@ -1,0 +1,15 @@
+---
+victoriametrics_version: 'v1.125.0'
+
+victoriametrics_base_path: '/opt/victoriametrics'
+victoriametrics_group: 'victoriametrics'
+victoriametrics_user: 'victoriametrics'
+
+victoriametrics_type: 'single'
+
+victoriametrics_data_path: '/opt/victoriametrics/data'
+victoriametrics_scrape_interval: '30s'
+victoriametrics_retention_period: '12'
+victoriametrics_max_concurrent_insert: 32
+victoriametrics_search_max_unique_ts: 900000
+victoriametrics_extra_configs: []

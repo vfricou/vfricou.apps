@@ -1,0 +1,79 @@
+---
+- name: 'single | main | Check if VictoriaMetrics is installed'
+  become: true
+  tags:
+    - victoriametrics
+    - victoriametrics_install
+  changed_when: false
+  check_mode: true
+  register: __vmetrics_bin_exists
+  ansible.builtin.stat:
+    path: "{{ victoriametrics_base_path }}/bin/victoria-metrics-prod"
+
+- name: 'single | main | Check VictoriaMetrics current version'
+  become: true
+  tags:
+    - victoriametrics
+    - victoriametrics_install
+  changed_when: false
+  register: __vmetrics_version
+  when:
+    - __vmetrics_bin_exists.stat.exists
+  ansible.builtin.command:
+    cmd: "{{ victoriametrics_base_path }}/bin/victoria-metrics-prod --version"
+
+- name: 'single | main | Perform installation'
+  when:
+    - not __vmetrics_bin_exists.stat.exists or
+      (
+        __vmetrics_version is defined and
+        victoriametrics_version not in __vmetrics_version.stdout
+      )
+  block:
+    - name: 'single | main | Download VictoriaMetrics package'
+      become: true
+      tags:
+        - victoriametrics
+        - victoriametrics_install
+      ansible.builtin.get_url:
+        url: "{{ victoriametrics_dl_url | default(victoriametrics_vars['dl_base_url'], true) }}/{{ victoriametrics_pkg_name | default(victoriametrics_vars['single']['dl_pkg_name'], true) }}" # noqa: yaml[line-length]
+        dest: "{{ victoriametrics_base_path }}/archives/{{ victoriametrics_pkg_name | default(victoriametrics_vars['single']['dl_pkg_name'], true) }}"
+        owner: "{{ victoriametrics_user }}"
+        group: "{{ victoriametrics_group }}"
+        mode: '0600'
+
+    - name: 'single | main | Unarchive VictoriaMetrics binary'
+      become: true
+      tags:
+        - victoriametrics
+        - victoriametrics_install
+      notify: 'Restart VictoriaMetrics single'
+      ansible.builtin.unarchive:
+        remote_src: true
+        dest: "{{ victoriametrics_base_path }}/bin"
+        src: "{{ victoriametrics_base_path }}/archives/{{ victoriametrics_pkg_name | default(victoriametrics_vars['single']['dl_pkg_name'], true) }}"
+        owner: "{{ victoriametrics_user }}"
+        group: "{{ victoriametrics_group }}"
+        mode: '0500'
+        seuser: 'system_u'
+        serole: 'object_r'
+        setype: 'bin_t'
+        selevel: 's0'
+
+- name: 'single | main | Deploy VictoriaMetrics systemd unit'
+  become: true
+  tags:
+    - victoriametrics
+    - victoriametrics_install
+    - victoriametrics_configure
+  notify: 'Restart VictoriaMetrics single'
+  ansible.builtin.template:
+    dest: '/etc/systemd/system/victoriametrics.service'
+    src: 'single/systemd/victoriametrics.service.j2'
+    owner: 'root'
+    group: 'root'
+    mode: '0644'
+    seuser: 'system_u'
+    serole: 'object_r'
+    setype: 'systemd_unit_file_t'
+    selevel: 's0'

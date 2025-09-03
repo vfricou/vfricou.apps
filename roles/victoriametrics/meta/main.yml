@@ -1,0 +1,21 @@
+---
+galaxy_info:
+  role_name: "victoriametrics"
+  author: "Vincent FRICOU"
+  description: |
+    Install Victoriametrics
+  issue_tracker_url: "https://github.com/vfricou/vfricou.apps/issues"
+  license: "AGPL-3.0-only"
+  min_ansible_version: "2.9"
+  platforms:
+    - name: "EL"
+      versions:
+        - '7'
+        - '8'
+        - '9'
+    - name: "Debian"
+      versions:
+        - 'buster'
+        - 'bullseye'
+
+collections: []
