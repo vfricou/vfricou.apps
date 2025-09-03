@@ -3,3 +3,16 @@ victoriametrics_vars:
   dl_base_url: "https://github.com/VictoriaMetrics/VictoriaMetrics/releases/download/{{ victoriametrics_version }}/"
   single:
     dl_pkg_name: "victoria-metrics-linux-amd64-{{ victoriametrics_version }}.tar.gz"
+  cluster:
+    dl_pkg_name: "victoria-metrics-linux-amd64-{{ victoriametrics_version }}-cluster.tar.gz"
+  useless_bin:
+    vminsert:
+      - vmselect
+      - vmstorage
+    vmselect:
+      - vminsert
+      - vmstorage
+    vmstorage:
+      - vminsert
+      - vmselect
+

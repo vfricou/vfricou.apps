@@ -2,8 +2,15 @@
 - name: 'Import preflight tasks'
   ansible.builtin.import_tasks:
     file: preflight.yml
+
 - name: 'Go to single tasks'
   when:
     - victoriametrics_type == 'single'
   ansible.builtin.import_tasks:
     file: single/main.yml
+
+- name: 'Go to single tasks'
+  when:
+    - victoriametrics_type == 'cluster'
+  ansible.builtin.import_tasks:
+    file: cluster/main.yml

@@ -1,0 +1,10 @@
+---
+- name: "cluster | vmstorage | clean | Remove useless binaries"
+  become: true
+  tags:
+    - victoriametrics
+    - victoriametrics_install
+  loop: "{{ victoriametrics_vars['useless_bin'][victoriametrics_cluster_role] }}"
+  ansible.builtin.file:
+    path: "{{ victoriametrics_base_path }}/bin/{{ item }}-prod"
+    state: absent

@@ -1,0 +1,21 @@
+---
+- name: "cluster | assert | Check if VictoriaMetrics is installed"
+  become: true
+  tags:
+    - victoriametrics
+  changed_when: false
+  check_mode: true
+  register: __vmetrics_bin_exists
+  ansible.builtin.stat:
+    path: "{{ victoriametrics_base_path }}/bin/{{ victoriametrics_cluster_role }}-prod"
+
+- name: "cluster | assert | Check VictoriaMetrics current version"
+  become: true
+  tags:
+    - victoriametrics
+  changed_when: false
+  register: __vmetrics_version
+  when:
+    - __vmetrics_bin_exists.stat.exists
+  ansible.builtin.command:
+    cmd: "{{ victoriametrics_base_path }}/bin/{{ victoriametrics_cluster_role }}-prod --version"

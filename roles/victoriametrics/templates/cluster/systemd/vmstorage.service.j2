@@ -1,0 +1,41 @@
+{{ ansible_managed | comment }}
+
+[Unit]
+Description=VictoriaMetrics vmstorage service
+After=network.target
+
+[Service]
+Type=simple
+LimitNOFILE=2097152
+UMask=0077
+User={{ victoriametrics_user }}
+Group={{ victoriametrics_group }}
+ExecStart={{ victoriametrics_base_path }}/bin/vmstorage-prod \
+          -storageDataPath={{ victoriametrics_data_path }} \
+          -retentionPeriod={{ victoriametrics_retention_period }} \
+          -maxConcurrentInserts={{ victoriametrics_max_concurrent_insert }} \
+          -search.maxUniqueTimeseries={{ victoriametrics_search_max_unique_ts }} \
+          -denyQueriesOutsideRetention \
+          {{ victoriametrics_extra_configs | join(' ') }}
+SyslogIdentifier=victoriametrics
+Restart=always
+
+PrivateTmp=yes
+ProtectHome=yes
+PrivateUsers=yes
+PrivateDevices=yes
+ProtectClock=yes
+ProtectKernelLogs=yes
+ProtectKernelModules=yes
+ProtectKernelTunables=yes
+ProtectHostname=yes
+RestrictNamespaces=yes
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX AF_NETLINK
+RestrictRealtime=yes
+NoNewPrivileges=yes
+LockPersonality=yes
+
+ProtectSystem=full
+
+[Install]
+WantedBy=multi-user.target

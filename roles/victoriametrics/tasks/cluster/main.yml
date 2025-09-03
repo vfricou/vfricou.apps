@@ -1,0 +1,70 @@
+---
+- name: 'Import assertion tasks'
+  tags:
+    - victoriametrics
+    - victoriametrics_install
+  ansible.builtin.import_tasks:
+    file: "assert.yml"
+
+- name: 'cluster | main | Perform installation'
+  when:
+    - not __vmetrics_bin_exists.stat.exists or
+      (
+        __vmetrics_version is defined and
+        victoriametrics_version not in __vmetrics_version.stdout
+      )
+  block:
+    - name: 'cluster | main | Download VictoriaMetrics package'
+      become: true
+      tags:
+        - victoriametrics
+        - victoriametrics_install
+      ansible.builtin.get_url:
+        url: "{{ victoriametrics_dl_url | default(victoriametrics_vars['dl_base_url'], true) }}/{{ victoriametrics_pkg_name | default(victoriametrics_vars['cluster']['dl_pkg_name'], true) }}" # noqa: yaml[line-length]
+        dest: "{{ victoriametrics_base_path }}/archives/{{ victoriametrics_pkg_name | default(victoriametrics_vars['cluster']['dl_pkg_name'], true) }}"
+        owner: "{{ victoriametrics_user }}"
+        group: "{{ victoriametrics_group }}"
+        mode: '0600'
+
+    - name: 'cluster | main | Unarchive VictoriaMetrics binary'
+      become: true
+      tags:
+        - victoriametrics
+        - victoriametrics_install
+      notify: 'Restart VictoriaMetrics cluster'
+      ansible.builtin.unarchive:
+        remote_src: true
+        dest: "{{ victoriametrics_base_path }}/bin"
+        src: "{{ victoriametrics_base_path }}/archives/{{ victoriametrics_pkg_name | default(victoriametrics_vars['cluster']['dl_pkg_name'], true) }}"
+        owner: "{{ victoriametrics_user }}"
+        group: "{{ victoriametrics_group }}"
+        mode: '0500'
+        seuser: 'system_u'
+        serole: 'object_r'
+        setype: 'bin_t'
+        selevel: 's0'
+
+- name: 'Import role clean tasks'
+  tags:
+    - victoriametrics
+    - victoriametrics_install
+  ansible.builtin.import_tasks:
+    file: "clean.yml"
+
+- name: 'cluster | main | Deploy VictoriaMetrics systemd unit'
+  become: true
+  tags:
+    - victoriametrics
+    - victoriametrics_install
+    - victoriametrics_configure
+  notify: 'Restart VictoriaMetrics {{ victoriametrics_cluster_role }}'
+  ansible.builtin.template:
+    dest: "/etc/systemd/system/{{ victoriametrics_cluster_role }}.service"
+    src: "cluster/systemd/{{ victoriametrics_cluster_role }}.service.j2"
+    owner: 'root'
+    group: 'root'
+    mode: '0644'
+    seuser: 'system_u'
+    serole: 'object_r'
+    setype: 'systemd_unit_file_t'
+    selevel: 's0'

@@ -39,7 +39,8 @@ argument_specs:
         required: false
         default: 'single'
         choices:
-          - single
+          - 'single'
+          - 'cluster'
       victoriametrics_data_path:
         type: str
         description:
@@ -86,6 +87,25 @@ argument_specs:
         type: str
         description:
           - 'Define override package name to download and extract for VictoriaMetrics'
+        required: false
+
+      victoriametrics_cluster_role:
+        type: str
+        description:
+          - 'Define node role for cluster deployment'
+          - 'Must have only one role per node'
+        required: true
+      victoriametrics_cluster_storage_nodes:
+        type: list
+        elements: str
+        description:
+          - 'Define vmstorage node list'
+        required: false
+      victoriametrics_cluster_select_nodes:
+        type: list
+        elements: str
+        description:
+          - 'Define vmselect node list'
         required: false
 
     examples: |

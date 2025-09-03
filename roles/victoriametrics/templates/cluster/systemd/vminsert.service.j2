@@ -1,0 +1,39 @@
+{{ ansible_managed | comment }}
+
+[Unit]
+Description=VictoriaMetrics vminsert service
+After=network.target
+
+[Service]
+Type=simple
+LimitNOFILE=2097152
+UMask=0077
+User={{ victoriametrics_user }}
+Group={{ victoriametrics_group }}
+ExecStart={{ victoriametrics_base_path }}/bin/vminsert-prod \
+          -maxConcurrentInserts={{ victoriametrics_max_concurrent_insert }} \
+          -enableMetadata \
+          -storageNode={{ victoriametrics_cluster_storage_nodes | join(',') }} \
+          {{ victoriametrics_extra_configs | join(' ') }}
+SyslogIdentifier=victoriametrics
+Restart=always
+
+PrivateTmp=yes
+ProtectHome=yes
+PrivateUsers=yes
+PrivateDevices=yes
+ProtectClock=yes
+ProtectKernelLogs=yes
+ProtectKernelModules=yes
+ProtectKernelTunables=yes
+ProtectHostname=yes
+RestrictNamespaces=yes
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX AF_NETLINK
+RestrictRealtime=yes
+NoNewPrivileges=yes
+LockPersonality=yes
+
+ProtectSystem=full
+
+[Install]
+WantedBy=multi-user.target

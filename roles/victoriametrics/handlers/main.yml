@@ -6,3 +6,27 @@
     state: restarted
     enabled: true
     daemon_reload: true
+
+- name: 'Restart VictoriaMetrics vmselect'
+  become: true
+  ansible.builtin.systemd:
+    name: 'vmselect.service'
+    state: restarted
+    enabled: true
+    daemon_reload: true
+
+- name: 'Restart VictoriaMetrics vminsert'
+  become: true
+  ansible.builtin.systemd:
+    name: 'vminsert.service'
+    state: restarted
+    enabled: true
+    daemon_reload: true
+
+- name: 'Restart VictoriaMetrics vmstorage'
+  become: true
+  ansible.builtin.systemd:
+    name: 'vmstorage.service'
+    state: restarted
+    enabled: true
+    daemon_reload: true
