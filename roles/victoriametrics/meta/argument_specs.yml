@@ -1,0 +1,101 @@
+---
+argument_specs:
+  main:
+    author:
+      - 'Vincent FRICOU'
+    short_description: 'Install and configure Victoria Metrics'
+    description:
+      - 'Install Victoria Metrics'
+    options:
+      victoriametrics_version:
+        type: str
+        description:
+          - 'VictoriaMetrics version to install'
+          - 'Refer to L(GitHub Releases,https://github.com/VictoriaMetrics/VictoriaMetrics/releases/tag/v1.125.0)'
+        required: false
+        default: 'v1.125.0'
+      victoriametrics_base_path:
+        type: str
+        description:
+          - 'Base path containing VictoriaMetrics binaries, datas, …'
+        required: false
+        default: '/opt/victoriametrics'
+      victoriametrics_user:
+        type: str
+        description:
+          - 'VictoriaMetrics system user'
+        required: false
+        default: 'victoriametrics'
+      victoriametrics_group:
+        type: str
+        description:
+          - 'VictoriaMetrics system group'
+        required: false
+        default: 'victoriametrics'
+      victoriametrics_type:
+        type: str
+        description:
+          - 'Victoriametrics deployment type'
+        required: false
+        default: 'single'
+        choices:
+          - single
+      victoriametrics_data_path:
+        type: str
+        description:
+          - 'VictoriaMetrics data path override if different than default path'
+        required: false
+      victoriametrics_scrape_interval:
+        type: str
+        description:
+          - 'Interval for self-scraping own metrics at /metrics page'
+        required: false
+        default: '30s'
+      victoriametrics_retention_period:
+        type: str
+        description:
+          - 'Data retention period in days'
+        required: false
+        default: '14'
+      victoriametrics_max_concurrent_insert:
+        type: int
+        description:
+          - 'The maximum number of concurrent insert requests.'
+          - 'Set higher value when clients send data over slow networks.'
+        required: false
+        default: 32
+      victoriametrics_search_max_unique_ts:
+        type: int
+        description:
+          - 'The maximum number of unique time series.'
+          - 'This option allows limiting memory usage.'
+        required: false
+        default: 900000
+      victoriametrics_extra_configs:
+        type: list
+        description:
+          - 'Define additionnal VictoriaMetrics options'
+        required: false
+        default: []
+      victoriametrics_dl_url:
+        type: str
+        description:
+          - 'Define override download URL for VictoriaMetrics package (without package name)'
+        required: false
+      victoriametrics_pkg_name:
+        type: str
+        description:
+          - 'Define override package name to download and extract for VictoriaMetrics'
+        required: false
+
+    examples: |
+      # Playbook VictoriaMetrics deployment
+      ---
+      - name: 'VictoriaMetrics'
+        hosts:
+          - vmetric_server
+        vars:
+          victoriametrics_type: single
+        roles:
+          - name: 'Install VictoriaMetrics single'
+            role: vfricou.apps.victoriametrics'

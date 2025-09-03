@@ -1,0 +1,54 @@
+---
+- name: 'preflight | Ensure system group exist'
+  become: true
+  tags:
+    - victoriametrics
+    - victoriametrics_install
+  ansible.builtin.group:
+    name: "{{ victoriametrics_group }}"
+    system: true
+    state: present
+
+- name: 'preflight | Ensure system user exist'
+  become: true
+  tags:
+    - victoriametrics
+    - victoriametrics_install
+  ansible.builtin.user:
+    name: "{{ victoriametrics_user }}"
+    system: true
+    state: present
+    password_lock: true
+    shell: '/usr/bin/bash'
+
+- name: 'preflight | Ensure directories exists'
+  become: true
+  tags:
+    - victoriametrics
+    - victoriametrics_install
+  loop:
+    - "{{ victoriametrics_base_path }}"
+    - "{{ victoriametrics_base_path }}/archives"
+    - "{{ victoriametrics_base_path }}/bin"
+    - "{{ victoriametrics_data_path }}"
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ victoriametrics_user }}"
+    group: "{{ victoriametrics_group }}"
+    mode: 'g+rwX,o-rwx'
+    seuser: 'system_u'
+    serole: 'object_r'
+    setype: 'var_lib_t'
+    selevel: 's0'
+
+- name: 'preflight | Ensure required packages are installed'
+  become: true
+  tags:
+    - victoriametrics
+    - victoriametrics_install
+  ansible.builtin.package:
+    state: present
+    name:
+      - tar
+      - gzip

@@ -1,0 +1,8 @@
+---
+- name: 'Restart VictoriaMetrics single'
+  become: true
+  ansible.builtin.systemd:
+    name: 'victoriametrics.service'
+    state: restarted
+    enabled: true
+    daemon_reload: true
